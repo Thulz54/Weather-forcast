@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Weather Forecast App</title>
+  <style>
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background: #e3f2fd;
+    color: #333;
+    text-align: center;
+    margin: 0;
+    padding: 1rem;
+  }
+  header {
+    background: #2196f3;
+    color: white;
+    padding: 1rem;
+  }
+  form {
+    margin-top: 1rem;
+  }
+  input[type="search"] {
+    padding: 0.5rem;
+    width: 200px;
+  }
+  input[type="submit"] {
+    padding: 0.5rem 1rem;
+    background-color: #0d47a1;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+  .current-weather, .forecast {
+    margin: 2rem auto;
+  }
+
+  .forecast-grid {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  }
+
+  .forecast-day {
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 0.5rem;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  width: 80px;
+ }
+
+</style>
+</head>
+<body>
+<header>
+<h1>Weather Forecast App</h1>
+<form>
+<input type="search" placeholder="Enter city..." required />
+<input type="submit" value="🔎 Search" />
+</form>
+</header>
+
+<main>
+<div class="current-weather"></div>
+<div class="forecast"></div>
+</main>
+<footer>
+  <p>
+    Coded by 
+    <a href="https://shecodes.io/graduates/163326-nokuthula-mthimunye" target="_blank">Nokuthula Mthimunye</a> —
+    <a href="https://github.com/Thulz54" target="_blank">GitHub</a> —
+    <a href="https://your-site.netlify.app" target="_blank">Hosted on Netlify</a>
+  </p>
+</footer>
+
+                                                                                
+                                                                                
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+                                                                                      
+const apiKey = "fbf2o208f95abce4a34t1e1f397a64a5";
+
+function formatDate(timestamp) {
+const localTime = new Date(timestamp * 1000);
+const dateOptions = { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' };
+const timeOptions = { hour: '2-digit', minute: '2-digit' };
+                                                                                        
+const date = localTime.toLocaleDateString(undefined, dateOptions)
+const time = localTime.toLocaleTimeString(undefined, timeOptions);
+return `${date} - ${time}`;
+}                                                                                                                                                                                  function displayCurrentWeather(response) {const weather = response.data;
+const localDateTime = formatDate(weather.time);
+document.querySelector(".current-weather").innerHTML = `
+
+<h2>${weather.city}, ${weather.country}</h2>
+<div><em>${localDateTime}</em></div>
+<div><img src="${weather.condition.icon_url}" alt="${weather.condition.description}" /></div
+<div><strong>${weather.condition.description}</strong></div>
+<div>🌡 Temperature: ${weather.temperature.current}°C</div>
+<div>💧 Humidity: ${weather.temperature.humidity}%</div>
+<div>🌬 Wind: ${weather.wind.speed} km/h</div>
+`;
+
+}
+function displayForecast(response) {
+const forecastHTML = response.data.daily
+.slice(1, 6)
+.map((day) => {
+  const date = new Date(day.time * 1000);
+  const dayName = date.toLocaleDateString(undefined, { weekday: "short" });
+
+return `
+ <div class="forecast-day">
+ <div>${dayName}</div>
+ <img src="${day.condition.icon_url}" alt="${day.condition.description}" />
+ <div>${Math.round(day.temperature.day)}°C</div>
+</div>
+   `;
+})
+.join("");
+document.querySelector(".forecast").innerHTML = `<h3>5-Day Forecast</h3><div class="forecast-grid">${forecastHTML}</div>`;
+}
+
+function fetchWeather(city) {
+const currentUrl = `https://api.shecodes.io/weather/v1/current?query=${city}&key=${apiKey}&units=metric`;
+const forecastUrl = `https://api.shecodes.io/weather/v1/forecast?query=${city}&key=${apiKey}&units=metric`;
+axios.get(currentUrl).then(displayCurrentWeather).catch(() => {
+document.querySelector("main").innerHTML = `<p>❌ Could not find that city. Try again.</p>`;
+});
+axios.get(forecastUrl).then(displayForecast);
+}
+function handleFormSubmit(event) {
+event.preventDefault();
+const city = document.querySelector("input[type='search']").value.trim();
+if (city) {
+fetchWeather(city);
+}
+}
+document.querySelector("form").addEventListener("submit", handleFormSubmit);                                                                                                               
+fetchWeather("Cape Town");
+
+                                                                                                                                                                                                                                                      
+                                                                                                                                                                                                                                                      
+                                                                                                                                                                                                                                                      
+                                                                                                                                                                                                                                                      
+</script>
+</body>
+</html>
